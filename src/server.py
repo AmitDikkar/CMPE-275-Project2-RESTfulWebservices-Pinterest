@@ -1,5 +1,4 @@
 from bottle import request, response, route, run, template
-from couchquery import Database
 from dal import CouchDB
 
 dao = CouchDB()
