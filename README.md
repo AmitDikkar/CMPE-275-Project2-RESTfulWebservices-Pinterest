@@ -5,6 +5,7 @@ Academic Project: CMPE 275 Project-2
 
 Team Members:
 1. Amit Dikkar
+2. Anup Gade
 
 
 This project is python based web services for pinterest like application.
