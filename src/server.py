@@ -1,7 +1,8 @@
 from bottle import request, response, route, run, template
 from couchquery import Database
+from dal import CouchDB
 
-db=Database("http://localhost:5984/pinterest")
+dao = CouchDB()
 
 #Sign Up constants
 signup_error = 'Error occured during sign up. Please try later'
@@ -16,8 +17,7 @@ def signup():
     json = request.json
     msg = signup_error
     try:
-        info = db.create(json)
-        doc = db.get(info['id'])
+        dao.createDoc(json)
         msg = signup_response
     except:
         response.statusCode = 400
