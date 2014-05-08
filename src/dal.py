@@ -18,15 +18,12 @@ class CouchDB:
     def __init__(self):
         self.db = Database(self.url)
 
-    def getdoc(self,id):
+    def getDoc(self, id):
         return self.db.get(id)
 
-    def createdoc(self, json):
+    def createDoc(self, json):
         return self.db.create(json)
 
-    def deletedoc(self, id):
+    def deleteDoc(self, id):
         doc = self.getDoc(id)
         self.db.delete(doc)
-
-
-
