@@ -27,3 +27,13 @@ class CouchDB:
     def deleteDoc(self, id):
         doc = self.getDoc(id)
         self.db.delete(doc)
+
+class DBFactory:
+
+    db = None
+
+    @staticmethod
+    def getdb():
+        if DBFactory.db is None:
+            db = CouchDB()
+        return db

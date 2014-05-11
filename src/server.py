@@ -1,38 +1,53 @@
-from bottle import request, response, route, run, template
-from dal import CouchDB
+from bottle import request, response, route, run, error
+from constants import Constants
+from src.user import User
 
-dao = CouchDB()
-
-#Sign Up constants
-signup_error = 'Error occured during sign up. Please try later'
-signup_response = '{ "links" : [{"url":"/users/login/","method": "POST"}]}'
+'''error routes'''
 
 
-@route('/signup')  # or @post('/services/signup')
-def get():
-    return "Hello Bottle"
+@error(404)
+def error404(error):
+    return 'Sorry. Nothing here. Try /users/login or /signup'
 
+
+'''user resource routes '''
+
+def validateinput(request):
+    try:
+        return request.json
+    except:
+        return None
 
 @route('/signup', method='POST')  # or @post('/services/signup')
 def signup():
-    json = request.json
-    msg = signup_error
+    json = validateinput(request)
+    if json is None:
+        return Constants.ERROR_INVALID_INPUT
+
     try:
-        dao.createdoc(json)
-        msg = signup_response
-    except:
-        response.statusCode = 400
-    return msg
+        user = User()
+        msg = user.registeruser(json)
+        response.status = Constants.RESOURCE_CREATED  #resource created successfully
+        return msg
+    except Exception as e:
+        response.status = Constants.INTERNAL_SERVER_ERROR  #internal server error
+        return e
 
-
-@route('/login', method='POST')
+@route('/users/login', method='POST')
 def login():
-    json = request.json
-    return "Authenticating " + json['email']
+    json = validateinput(request)
+    if json is None:
+        return Constants.ERROR_INVALID_INPUT
 
+    try:
+        user = User()
+        msg = user.authenticateuser(json)
+        response.status = Constants.ACCEPTED  #login request successful
+        return msg
+    except Exception as e:
+        response.status = Constants.AUTH_ERROR  #authentication failed
+        return e
 
-@route('/user/<id>', method='DELETE')
-def deleteuser(id):
-    return template("Deleting user {{userId}}.", userId=id)
+'''board resource routes'''
 
 run(host='localhost', port=8080)
