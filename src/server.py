@@ -1,6 +1,7 @@
 from bottle import request, response, route, run, error
 from constants import Constants
 from src.user import User
+from util import Util
 
 '''error routes'''
 
@@ -12,15 +13,21 @@ def error404(error):
 
 '''user resource routes '''
 
-def validateinput(request):
+def validate_input(request):
     try:
         return request.json
     except:
         return None
 
+
+def is_user_authenticated(request):
+    if request.get_cookie(Constants.COOKIE_KEY):
+        return True
+    return False
+
 @route('/signup', method='POST')  # or @post('/services/signup')
 def signup():
-    json = validateinput(request)
+    json = validate_input(request)
     if json is None:
         return Constants.ERROR_INVALID_INPUT
 
@@ -35,13 +42,14 @@ def signup():
 
 @route('/users/login', method='POST')
 def login():
-    json = validateinput(request)
+    json = validate_input(request)
     if json is None:
         return Constants.ERROR_INVALID_INPUT
 
     try:
         user = User()
         msg = user.authenticateuser(json)
+        response.set_cookie(Constants.COOKIE_KEY, Util.normalizestring(json[Constants.EMAIL]))
         response.status = Constants.ACCEPTED  #login request successful
         return msg
     except Exception as e:

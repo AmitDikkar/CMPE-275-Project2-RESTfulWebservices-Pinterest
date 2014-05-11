@@ -19,6 +19,7 @@ class Constants:
     ERROR_LOGIN = 'Invalid user name or password'
     RESPONSE_LOGIN = '{"links": [{"url": "/users/{userId}/boards", "method" : "GET"},' \
                  '{"url": "/users/{userId}/boards", "method" : "POST"}]}'
+    ERROR_SESSION = 'Invalid user session. Please login via "/users/login/" url'
 
     #User constants
     EMAIL = 'email'
@@ -26,3 +27,6 @@ class Constants:
     DOCUMENT_ID = '_id'
     USER_ID = '{userId}'
     PASSWORD = 'password'
+    EMAIL_REGEX = '\.|@'
+    NORMALIZE_CHAR = '-'
+    COOKIE_KEY = 'pinterest-user'

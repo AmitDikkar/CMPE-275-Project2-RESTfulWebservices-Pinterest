@@ -1,6 +1,6 @@
 from dal import DBFactory
 from constants import Constants
-
+from util import Util
 
 class User:
 
@@ -19,7 +19,8 @@ class User:
             raise ValueError(Constants.ERROR_INVALID_FIRST_NAME)
 
         try:
-            user[Constants.DOCUMENT_ID] = user[Constants.EMAIL]
+            userid = Util.normalizestring(user[Constants.EMAIL])
+            user[Constants.DOCUMENT_ID] = userid
             self.connection.createDoc(user)
             return Constants.RESPONSE_SIGNUP
         except:
