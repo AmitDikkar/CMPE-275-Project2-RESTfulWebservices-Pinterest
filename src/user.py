@@ -2,6 +2,7 @@ from dal import DBFactory
 from constants import Constants
 from util import Util
 
+
 class User:
 
     def __init__(self):
