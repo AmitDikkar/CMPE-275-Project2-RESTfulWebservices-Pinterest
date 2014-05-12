@@ -115,6 +115,65 @@ class PinDao:
                 print 'error in updating pin'
                 return None
 
+        @staticmethod
+    def likeAndGetPin(self,likeBy, userId, boardName, pinName):
+        try:
+            doc = self.db.getDoc(userId)
+            boards = doc["boards"]
+            for board in boards:
+                if board["boardName"] == boardName:
+                    for pin in board["pins"]:
+                        if pin["pinName"] == pinName:
+                            if likeBy not in pin["likes"]:
+                                pin["likes"].append(likeBy)
+                                print "Appended here"
+                                self.db.updateDoc(doc)
+                                print "Updated in if"
+                                return pin
+                            else:
+                                pin["likes"].remove(likeBy)
+                                print "Removed from list: Unlike"
+                                self.db.updateDoc(doc)
+                                print "Updated in else"
+                        print "Updated All"
+                        return pin
+            return None
+        except Exception as e:
+            print "Exception: inside LinkAngGetPin"
+            print e.message
+            return None
+
+    @staticmethod
+    def followAndUnfollowUser(self, followerId, followTo):
+        print "UserDao: inside followAndUnfollowUser"
+        try:
+            followerDoc = self.db.getDoc(followerId)
+            followToDoc = self.db.getDoc(followTo)
+            print "UserDao: Both docs exists"
+
+            #add followTo to follows list of FollowerId
+            if followTo not in followerDoc["follows"]:
+                followerDoc["follows"].append(followTo)
+            else:
+                followerDoc["follows"].remove(followTo)
+
+            #add followersID to followers list of FollowTo
+            if followerId not in followToDoc["followers"]:
+                followToDoc["followers"].append(followerId)
+            else:
+                followToDoc["followers"].remove(followerId)
+
+            self.db.updateDoc(followerDoc)
+            self.db.updateDoc(followToDoc)
+            print "Updated both docs"
+            #return only the resource of follower
+            newdoc = self.db.getDoc(followerId)
+            print newdoc
+            return newdoc
+        except Exception as e:
+            print "Exception: UserDao followAndUnfollow user"
+            print e.message
+            return None
 
     #Comments related functions
     @staticmethod
@@ -219,6 +278,8 @@ class PinDao:
             print e.message
             print 'error in deleting comment'
 
+
+ 
     @staticmethod
     def getUserDoc(id):
         try:
