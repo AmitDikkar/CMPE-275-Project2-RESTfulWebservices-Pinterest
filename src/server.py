@@ -248,6 +248,42 @@ def form_createPin_response(userId, boardName):
     response_msg = response_msg.replace(WHITESPACE, HYPHEN)
     return response_msg
 
+#################################  Comment Operations  ###########################################
+#Comments related functions
+@route('/users/<userId>/boards/<boardName>/<pinName>/comments/', method='POST')
+def addComment(userId,boardName,pinName,addedBy):
+    json = request.json
+    msg='success'
+    print 'Add Comment called'
+    try:
+        dal.addNewComment(userId, boardName,pinName, json)
+        #msg = form_addComment_response(userId, boardName)
+    except:
+        response.statusCode = 400
+        #msg = comment_add_fail
+    return msg
+
+@route('/users/<UserId>/boards/<boardName>/<pinName>/comments/<comment>', method='GET')
+def getComment(UserId,boardName,pinName,comment):
+    comment = dal.getComment(UserId,boardName,pinName,comment)
+    if comment == None:
+        return "Comment not found"
+    return comment
+
+@route('/users/<UserId>/boards/<boardName>/<pinName>/comments/all', method='GET')
+def getAllComments(UserId,boardName,pinName,comment):
+    comment = dal.getAllComments(UserId,boardName,pinName)
+    if comment == None:
+        return "No Comments found"
+    return comment
+
+@route('/users/<UserId>/boards/<boardName>/<pinName>/comments/<addedBy>/<comment>/', method='DELETE')
+def deleteComment(UserId,boardName,pinName,addedBy,comment):
+    msg = dal.deleteComment(UserId,boardName,pinName,addedBy,comment)
+    if msg == None:
+        return "not found"
+    return "deleted"
+
 ###############################################################################################
 
 def form_getboard_response(id, board):
