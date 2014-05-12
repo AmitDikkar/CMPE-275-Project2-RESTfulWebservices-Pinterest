@@ -1,6 +1,6 @@
 from bottle import request, response, route, run, error
 from constants import Constants
-from src.user import User
+from user import User
 from util import Util
 
 '''error routes'''
@@ -56,6 +56,66 @@ def login():
         response.status = Constants.AUTH_ERROR  #authentication failed
         return e
 
-'''board resource routes'''
+@route('/users/<userId>', method='PUT')
+def updateUserProfile(userId):
+    print "Inside server.py"
+    json = request.json
+    responceList = user.updateUserProfile(userId, json)
+    if responceList[0] is not None:
+        print "not null"
+        response = responceList[1]
+        doc = responceList[2]
+        return doc
+    else:
+        response = responceList[1]
+        return responceList[2]
+
+@route('/users/<userId>/pins/likeResourse', method="POST")
+def likepin(userId):
+    """
+        :param userId:
+        :param boardName:
+        :param pinId:
+    """
+    json = request.json
+    try:
+        pinOf = json["pinOf"]
+        boardName = json["boardName"]
+        pinName = json["pinName"]
+        print "All retrieved"
+        responceList = user.likePin(userId,pinOf,boardName,pinName)
+        if responceList[0] is not None:
+            print "not null"
+            response.status = responceList[1]
+            doc = responceList[2]
+            return doc
+        else:
+            response.status = responceList[1]
+            return responceList[2]
+    except Exception as e:
+        print "Server:inside except"
+        print e.message
+        #one of the required fields are missing. Set status=400 (Bad Request)
+        response.status = 400
+        return e.message
+
+@route('/users/<userId>/follows',method="POST")
+def followUser(userId):
+    print "userId:"+userId
+    print request.query['followTo']
+    try:
+        followTo = request.query['followTo']
+        responseList = user.followUser(userId,followTo)
+        if responseList[0] is not None:
+            print "not null"
+            response.status = responseList[1]
+            return responseList[0]
+        else:
+            response.status = responseList[1]
+            return responseList[2]
+    except:
+        print "Exception in FollowUser"
+        response.status = 400
+        return "Error: Please provide all required fields"
 
 run(host='localhost', port=8080)

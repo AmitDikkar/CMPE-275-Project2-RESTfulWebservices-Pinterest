@@ -25,22 +25,25 @@ class CouchDB:
 
     def getDoc(self, id):
         document = None
+        try:
+            self.lock.acquire()
+            print "Lock Acquired"
 
-        self.lock.acquire()
+            if id not in self.cache.keys():  #document not in cache
+                print "id is not in cache"
+                document = self.read_db.get(id)
 
-        if id not in self.cache.keys():  #document not in cache
-            document = self.read_db.get(id)
+                if self.cache.__len__() == Constants.CACHE_SIZE:
+                    self.cache.popitem(False)  #remove the oldest entry from cache
 
-            if self.cache.__len__() == Constants.CACHE_SIZE:
-                self.cache.popitem(False)  #remove the oldest entry from cache
-
-            self.cache.__setitem__(id,  document)
-        else:  #get from cache
-            document = self.cache.__getitem__(id)
-
-        self.lock.release()
-
-        return document
+                self.cache.__setitem__(id,  document)
+            else:  #get from cache
+                print "Id is not in database"
+                document = self.cache.__getitem__(id)
+            return document
+        finally:
+            self.lock.release()
+            return document
 
     def createDoc(self, json):
         return self.write_db.create(json)
@@ -57,7 +60,11 @@ class CouchDB:
 
     def updateDoc(self, doc):
         try:
-            self.db.update(doc)
+            self.lock.acquire()
+            self.cache.pop(doc[Constants.DOCUMENT_ID])
+
+            self.write_db.update(doc)
+            self.lock.release()
         except Exception as e:
             raise
 
