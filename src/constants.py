@@ -35,3 +35,37 @@ class Constants:
     WRITE_URL = "http://127.0.0.1:5984/pinterest"
     READ_URL = "http://127.0.0.1:5984/pinterest"
     CACHE_SIZE = 100
+
+    #Board constants
+    create_board_error = 'Error occurred while creating the board. Please try later'
+    create_board_response = '{links:[{"url":"/users/{UserId}/boards/{boardName}","method":"GET"},' \
+                            '{"url":"/users/{UserId}/boards/{boardName}","method":"PUT"},' \
+                            '{"url":"/users/{UserId}/boards/{boardName},"method":"DELETE"},' \
+                            '{"url":"/users/{UserId}/boards/{boardName}/pins","method":"POST"}]}'
+
+    get_board_response = '{"board":{"boardName":"boardNameValue","boardDesc":"boardDescValue",' \
+                         '"category":"categoryValue","isPrivate":"isPrivateValue"},' \
+                         '"links":[{"url":"/users/{UserId}/boards/{boardName}","method":"PUT"},' \
+                         '{"url":"/users/{UserId}/boards/{boardName}","method":"DELETE"},' \
+                         '{"url":"/users/{UserId}/boards/{boardName}/pins","method":"POST"}]}'
+
+    delete_board_response = '{"url":"/users/{UserId}/boards","method":"POST"}'
+
+    get_boards_error = 'Error occurred while getting the list of boards'
+    get_board_error = 'Error while fetching the board details'
+    update_board_error = 'Error while updating the board'
+    delete_board_error = 'Error while deleting the board'
+
+    USERID = '{UserId}'
+    BOARD_NAME = '{boardName}'
+    HYPHEN = '-'
+    WHITESPACE = ' '
+    BOARDS = 'boards'
+    BOARD_NAME_VALUE = 'boardNameValue'
+    BOARD_DESC_VALUE = 'boardDescValue'
+    CATEGORY_VALUE = 'categoryValue'
+    IS_PRIVATE_VALUE = 'isPrivateValue'
+    BOARDNAME = 'boardName'
+    BOARD_DESC = 'boardDesc'
+    CATEGORY = 'category'
+    ISPRIVATE = 'isPrivate'

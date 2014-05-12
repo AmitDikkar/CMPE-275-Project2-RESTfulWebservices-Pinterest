@@ -56,10 +56,10 @@ class CouchDB:
 
 
     def updateDoc(self, doc):
-        try:
-            self.db.update(doc)
-        except Exception as e:
-            raise
+        self.lock.acquire()
+        self.cache.pop(doc[Constants.DOCUMENT_ID])  #clear document from cache
+        self.write_db.update(doc)
+        self.lock.release()
 
 
 class DBFactory:
