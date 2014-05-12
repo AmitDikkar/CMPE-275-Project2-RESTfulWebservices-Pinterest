@@ -56,6 +56,12 @@ class Constants:
     update_board_error = 'Error while updating the board'
     delete_board_error = 'Error while deleting the board'
 
+    #pin constants
+    create_pin_response ='{links:[{"url":"users/{UserId}/boards/{boardName}/pins/{pinId}","method":"GET"},' \
+                        '{"url":"users/{UserId}/boards/{boardName}/pins/{pinId}","method":"PUT"},' \
+                        '{"url":"users/{UserId}/boards/{boardName}/pins/{pinId},"method":"DELETE"}]}'
+
+
     USERID = '{UserId}'
     BOARD_NAME = '{boardName}'
     HYPHEN = '-'

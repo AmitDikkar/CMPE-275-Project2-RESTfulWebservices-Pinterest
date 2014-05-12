@@ -3,6 +3,7 @@ from constants import Constants
 from src.user import User
 from util import Util
 from BoardDao import BoardDao
+from PinDao import PinDao
 import json
 
 '''error routes'''
@@ -15,7 +16,7 @@ def error404(error):
 
 '''user resource routes '''
 user = User()
-
+pinDao = PinDao()
 
 def validate_input(request):
     try:
@@ -122,6 +123,77 @@ def getBoardDetails(id, boardName):
     except Exception as e:
         response.status = Constants.INTERNAL_SERVER_ERROR
         return e
+
+
+#################################  Pin Operations  ###########################################
+
+@route('/users/<userId>/boards/<boardName>/pins/', method='POST')
+def createPin(userId,boardName):
+    json = request.json
+    try:
+        msg = PinDao.addNewPin(userId, boardName, json)
+        if msg == None:
+            return "erroe in adding pin"
+        msg = form_createPin_response(userId, boardName)
+    except Exception as e:
+        print e.message
+        response.statusCode = 400
+        msg = "exception in adding pin"
+        return msg
+    return msg
+
+
+@route('/users/<UserId>/boards/<boardName>/<pinName>/', method='GET')
+def getPin(UserId,boardName,pinName):
+    try:
+        pins = pinDao.getPin(UserId,boardName,pinName)
+        if pins == None:
+            return "Pin not found"
+        return pins
+    except Exception as e:
+        print e.message
+
+@route('/users/<UserId>/boards/<boardName>/<pinName>/', method='PUT')
+def updatePin(UserId,boardName,pinName):
+    try:
+        json = request.json
+        msg = pinDao.updatePin(UserId,boardName,json,pinName)
+        if msg == None:
+            return msg
+        return msg
+    except Exception as e:
+        print e.message
+
+@route('/users/<UserId>/boards/<boardName>/<pinName>/', method='DELETE')
+def deletePin(UserId,boardName,pinName):
+    try:
+        msg = pinDao.deletePin(UserId,boardName,pinName)
+        if msg == None:
+            return "pin not found"
+        return "pin deleted"
+    except Exception as e:
+        print e.message
+
+
+@route('/users/<UserId>/boards/<boardName>/', method='GET')
+def getAllPins(UserId,boardName):
+    try:
+        boards = pinDao.getAllPins(UserId,boardName)
+        if boards == None:
+            return "board not found"
+        return boards
+    except Exception as e:
+        print e.message
+
+def form_createPin_response(userId, boardName):
+    response_msg = create_pin_response
+    response_msg = response_msg.replace(USERID, userId)
+    response_msg = response_msg.replace(BOARD_NAME,boardName)
+    response_msg = WHITESPACE.join(response_msg.split())
+    response_msg = response_msg.replace(WHITESPACE, HYPHEN)
+    return response_msg
+
+###############################################################################################
 
 def form_getboard_response(id, board):
     response_message = Constants.get_board_response.replace(Constants.BOARD_NAME_VALUE, board[Constants.BOARD_NAME])

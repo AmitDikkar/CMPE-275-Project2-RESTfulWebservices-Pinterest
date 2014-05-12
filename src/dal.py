@@ -8,6 +8,7 @@
 # Copyright:   (c) Joel 2014
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
+
 from couchquery import Database
 from collections import OrderedDict
 from threading import Lock
@@ -47,13 +48,13 @@ class CouchDB:
 
     def deleteDoc(self, id):
         self.lock.acquire()
-
         doc = self.getDoc(id)
         self.cache.pop(id)  #clear document from cache
         self.write_db.delete(doc)
-
         self.lock.release()
 
+    def saveDoc(self, doc):
+        self.db.save(doc)
 
     def updateDoc(self, doc):
         self.lock.acquire()
@@ -65,7 +66,6 @@ class CouchDB:
 class DBFactory:
 
     db = None
-
     @staticmethod
     def getdb():
         if DBFactory.db is None:
