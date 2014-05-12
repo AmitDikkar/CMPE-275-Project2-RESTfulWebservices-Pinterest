@@ -8,6 +8,7 @@ Team Members:
 2. Anup Gade
 3. Joel C
 4. Vijaya Kedar
+5. Hrishikesh Patil
 
 This project is python based web services for pinterest like application.
 We are trying to create all possible APIs for pininterest like application.
