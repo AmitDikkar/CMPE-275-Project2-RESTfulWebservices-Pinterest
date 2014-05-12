@@ -26,41 +26,58 @@ class CouchDB:
 
     def getDoc(self, id):
         document = None
+        try:
+            self.lock.acquire()
 
-        self.lock.acquire()
+            if id not in self.cache.keys():  #document not in cache
+                document = self.read_db.get(id)
 
-        if id not in self.cache.keys():  #document not in cache
-            document = self.read_db.get(id)
+                if self.cache.__len__() == Constants.CACHE_SIZE:
+                    self.cache.popitem(False)  #remove the oldest entry from cache
 
-            if self.cache.__len__() == Constants.CACHE_SIZE:
-                self.cache.popitem(False)  #remove the oldest entry from cache
-
-            self.cache.__setitem__(id,  document)
-        else:  #get from cache
-            document = self.cache.__getitem__(id)
-
-        self.lock.release()
-
-        return document
+                self.cache.__setitem__(id,  document)
+            else:  #get from cache
+                document = self.cache.__getitem__(id)
+            return document
+        finally:
+            self.lock.release()
+            return document
 
     def createDoc(self, json):
         return self.write_db.create(json)
 
     def deleteDoc(self, id):
+<<<<<<< HEAD
         self.lock.acquire()
         doc = self.getDoc(id)
         self.cache.pop(id)  #clear document from cache
         self.write_db.delete(doc)
         self.lock.release()
+=======
+        try:
+            self.lock.acquire()
+
+            doc = self.getDoc(id)
+            if id in self.cache:
+                self.cache.pop(id)  #clear document from cache
+            self.write_db.delete(doc)
+        finally:
+            self.lock.release()
+>>>>>>> 983028de02ba90f207408ef7fb5ec3729746a6f2
 
     def saveDoc(self, doc):
         self.db.save(doc)
 
     def updateDoc(self, doc):
-        self.lock.acquire()
-        self.cache.pop(doc[Constants.DOCUMENT_ID])  #clear document from cache
-        self.write_db.update(doc)
-        self.lock.release()
+        try:
+            self.lock.acquire()
+
+            if doc[Constants.DOCUMENT_ID] in self.cache:
+                self.cache.pop(doc[Constants.DOCUMENT_ID])  #clear document from cache
+            self.write_db.update(doc)
+            self.lock.release()
+        finally:
+            self.lock.release()
 
 
 class DBFactory:

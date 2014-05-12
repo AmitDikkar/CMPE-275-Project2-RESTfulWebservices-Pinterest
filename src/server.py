@@ -1,6 +1,6 @@
 from bottle import request, response, route, run, error, delete, put, get, post
 from constants import Constants
-from src.user import User
+from user import User
 from util import Util
 from BoardDao import BoardDao
 from PinDao import PinDao
@@ -59,7 +59,62 @@ def login():
         response.status = Constants.AUTH_ERROR  #authentication failed
         return e
 
-'''board resource routes'''
+@route('/users/<userId>', method='PUT')
+def updateUserProfile(userId):
+    print "Inside server.py"
+    json = request.json
+    responceList = user.updateUserProfile(userId, json)
+    if responceList[0] is not None:
+        print "not null"
+        response = responceList[1]
+        doc = responceList[2]
+        return doc
+    else:
+        response = responceList[1]
+        return responceList[2]
+
+@route('/users/<userId>/pins/likeResourse', method="POST")
+def likepin(userId):
+    json = request.json
+    try:
+        pinOf = json["pinOf"]
+        boardName = json["boardName"]
+        pinName = json["pinName"]
+        print "All retrieved"
+        responceList = user.likePin(userId,pinOf,boardName,pinName)
+        if responceList[0] is not None:
+            print "not null"
+            response.status = responceList[1]
+            doc = responceList[2]
+            return doc
+        else:
+            response.status = responceList[1]
+            return responceList[2]
+    except Exception as e:
+        print "Server:inside except"
+        print e.message
+        #one of the required fields are missing. Set status=400 (Bad Request)
+        response.status = 400
+        return e.message
+
+@route('/users/<userId>/follows',method="POST")
+def followUser(userId):
+    print "userId:"+userId
+    print request.query['followTo']
+    try:
+        followTo = request.query['followTo']
+        responseList = user.followUser(userId,followTo)
+        if responseList[0] is not None:
+            print "not null"
+            response.status = responseList[1]
+            return responseList[0]
+        else:
+            response.status = responseList[1]
+            return responseList[2]
+    except:
+        print "Exception in FollowUser"
+        response.status = 400
+        return "Error: Please provide all required fields"
 
 
 @post('/users/<id>/boards')
@@ -67,8 +122,8 @@ def createboard(id):
     json = request.json
     msg = Constants.create_board_error
     try:
-        BoardDao.createboard(json)
-        msg = form_createboard_response(id, json[Constants.BOARD_NAME])
+        BoardDao.createboard(json, id)
+        msg = form_createboard_response(id, json[Constants.BOARDNAME])
         response.status = Constants.RESOURCE_CREATED #Successful creation of a resource
         return msg
     except Exception as e:
@@ -82,7 +137,7 @@ def updateboard(id, boardName):
     msg = Constants.update_board_error
     boardName = boardName.replace(Constants.HYPHEN, Constants.WHITESPACE)
     try:
-        BoardDao.updateBoard(id, boardName, json)
+        BoardDao.updateBoard(id, boardName.lower(), json)
         msg = form_getboard_response(id, json)
         return msg
     except Exception as e:
@@ -106,7 +161,7 @@ def deleteBoard(id, boardName):
     boardName = boardName.replace(Constants.HYPHEN, Constants.WHITESPACE)
     msg = Constants.delete_board_error
     try:
-        BoardDao.deleteBoard(id, boardName)
+        BoardDao.deleteBoard(id, boardName.lower())
         msg = Constants.delete_board_response.replace(Constants.USERID, id)
         return msg
     except Exception as e:
@@ -117,7 +172,7 @@ def deleteBoard(id, boardName):
 def getBoardDetails(id, boardName):
     msg = Constants.get_board_error
     try:
-        json = BoardDao.getBoardDetails(id, boardName)
+        json = BoardDao.getBoardDetails(id, boardName.lower())
         msg = form_getboard_response(id, json)
         return msg
     except Exception as e:
@@ -196,7 +251,7 @@ def form_createPin_response(userId, boardName):
 ###############################################################################################
 
 def form_getboard_response(id, board):
-    response_message = Constants.get_board_response.replace(Constants.BOARD_NAME_VALUE, board[Constants.BOARD_NAME])
+    response_message = Constants.get_board_response.replace(Constants.BOARD_NAME_VALUE, board[Constants.BOARDNAME])
     response_message = response_message.replace(Constants.BOARD_DESC_VALUE, board[Constants.BOARD_DESC])
     response_message = response_message.replace(Constants.CATEGORY_VALUE, board[Constants.CATEGORY])
     isPrivate = str(board[Constants.ISPRIVATE])
