@@ -55,6 +55,13 @@ class CouchDB:
         self.lock.release()
 
 
+    def updateDoc(self, doc):
+        try:
+            self.db.update(doc)
+        except Exception as e:
+            raise
+
+
 class DBFactory:
 
     db = None
