@@ -66,8 +66,8 @@ def createboard(id):
     json = request.json
     msg = Constants.create_board_error
     try:
-        BoardDao.createboard(json)
-        msg = form_createboard_response(id, json[Constants.BOARD_NAME])
+        BoardDao.createboard(json, id)
+        msg = form_createboard_response(id, json[Constants.BOARDNAME])
         response.status = Constants.RESOURCE_CREATED #Successful creation of a resource
         return msg
     except Exception as e:
@@ -81,7 +81,7 @@ def updateboard(id, boardName):
     msg = Constants.update_board_error
     boardName = boardName.replace(Constants.HYPHEN, Constants.WHITESPACE)
     try:
-        BoardDao.updateBoard(id, boardName, json)
+        BoardDao.updateBoard(id, boardName.lower(), json)
         msg = form_getboard_response(id, json)
         return msg
     except Exception as e:
@@ -105,7 +105,7 @@ def deleteBoard(id, boardName):
     boardName = boardName.replace(Constants.HYPHEN, Constants.WHITESPACE)
     msg = Constants.delete_board_error
     try:
-        BoardDao.deleteBoard(id, boardName)
+        BoardDao.deleteBoard(id, boardName.lower())
         msg = Constants.delete_board_response.replace(Constants.USERID, id)
         return msg
     except Exception as e:
@@ -116,7 +116,7 @@ def deleteBoard(id, boardName):
 def getBoardDetails(id, boardName):
     msg = Constants.get_board_error
     try:
-        json = BoardDao.getBoardDetails(id, boardName)
+        json = BoardDao.getBoardDetails(id, boardName.lower())
         msg = form_getboard_response(id, json)
         return msg
     except Exception as e:
@@ -124,7 +124,7 @@ def getBoardDetails(id, boardName):
         return e
 
 def form_getboard_response(id, board):
-    response_message = Constants.get_board_response.replace(Constants.BOARD_NAME_VALUE, board[Constants.BOARD_NAME])
+    response_message = Constants.get_board_response.replace(Constants.BOARD_NAME_VALUE, board[Constants.BOARDNAME])
     response_message = response_message.replace(Constants.BOARD_DESC_VALUE, board[Constants.BOARD_DESC])
     response_message = response_message.replace(Constants.CATEGORY_VALUE, board[Constants.CATEGORY])
     isPrivate = str(board[Constants.ISPRIVATE])

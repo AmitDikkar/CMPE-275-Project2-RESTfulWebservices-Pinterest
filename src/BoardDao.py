@@ -1,3 +1,5 @@
+from src.constants import Constants
+
 __author__ = 'Vijaya'
 
 from dal import DBFactory
@@ -7,9 +9,13 @@ import json
 class BoardDao:
 
     @staticmethod
-    def createboard(json):
+    def createboard(board, userid):
         try:
-            DBFactory.getdb().createDoc(json)
+            doc = BoardDao.getUserDoc(userid)
+            if Constants.BOARDS not in doc:
+                doc.boards = []
+            doc.boards.append(board)
+            DBFactory.getdb().updateDoc(doc)
         except:
             raise
 
@@ -19,11 +25,11 @@ class BoardDao:
             doc = BoardDao.getUserDoc(id)
             boards = doc.boards
             for board in boards:
-                    if board['boardName'].lower() == boardName:
-                        board['boardName'] = newBoard['boardName']
-                        board['boardDesc'] = newBoard['boardDesc']
-                        board['category'] = newBoard['category']
-                        board['isPrivate'] = newBoard['isPrivate']
+                    if board[Constants.BOARDNAME].lower() == boardName:
+                        board[Constants.BOARDNAME] = newBoard[Constants.BOARDNAME]
+                        board[Constants.BOARD_DESC] = newBoard[Constants.BOARD_DESC]
+                        board[Constants.CATEGORY] = newBoard[Constants.CATEGORY]
+                        board[Constants.ISPRIVATE] = newBoard[Constants.ISPRIVATE]
                         DBFactory.getdb().updateDoc(doc)
                         return
         except:
@@ -43,7 +49,7 @@ class BoardDao:
             doc = BoardDao.getUserDoc(id)
             boards = doc.boards
             for index in xrange(len(boards)):
-                if boards[index]['boardName'] == boardName:
+                if boards[index][Constants.BOARDNAME].lower() == boardName:
                     boards.pop(index)
                     DBFactory.getdb().updateDoc(doc)
                     return
@@ -64,7 +70,7 @@ class BoardDao:
             boardName = boardName.replace('-', ' ')
             boards = BoardDao.getUserboards(id)
             for board in boards:
-                if board['boardName'].lower() == boardName:
+                if board[Constants.BOARDNAME].lower() == boardName:
                     return board
         except:
             raise

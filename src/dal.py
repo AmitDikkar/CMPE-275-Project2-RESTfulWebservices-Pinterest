@@ -49,17 +49,21 @@ class CouchDB:
         self.lock.acquire()
 
         doc = self.getDoc(id)
-        self.cache.pop(id)  #clear document from cache
+        if id in self.cache:
+            self.cache.pop(id)  #clear document from cache
         self.write_db.delete(doc)
-
         self.lock.release()
 
 
     def updateDoc(self, doc):
-        self.lock.acquire()
-        self.cache.pop(doc[Constants.DOCUMENT_ID])  #clear document from cache
-        self.write_db.update(doc)
-        self.lock.release()
+        try:
+            self.lock.acquire()
+            if doc[Constants.DOCUMENT_ID] in self.cache:
+                self.cache.pop(doc[Constants.DOCUMENT_ID])  #clear document from cache
+            self.write_db.update(doc)
+            self.lock.release()
+        except Exception as e:
+            print(e)
 
 
 class DBFactory:
