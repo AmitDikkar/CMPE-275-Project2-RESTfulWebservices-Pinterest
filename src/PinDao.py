@@ -115,7 +115,8 @@ class PinDao:
                 print 'error in updating pin'
                 return None
 
-        @staticmethod
+
+    @staticmethod
     def likeAndGetPin(self,likeBy, userId, boardName, pinName):
         try:
             doc = self.db.getDoc(userId)
@@ -205,6 +206,7 @@ class PinDao:
             print e.message
             print 'error in adding new comment'
 
+
     @staticmethod
     def getComment(self,UserId,boardName,pinName,addedBy,comment):
         try:
@@ -224,8 +226,9 @@ class PinDao:
             print e.message
             print 'error in fetching comment'
 
-     @staticmethod
-     def getAllComments(self,UserId,boardName,pinName):
+
+    @staticmethod
+    def getAllComments(self,UserId,boardName,pinName):
         try:
             doc = self.db.get(UserId)
             boards = doc["boards"]
@@ -278,12 +281,11 @@ class PinDao:
             print e.message
             print 'error in deleting comment'
 
-
- 
     @staticmethod
     def getUserDoc(id):
+        json_doc = []
         try:
-            json = DBFactory.getdb().getDoc(id)
+            json_doc = DBFactory.getdb().getDoc(id)
         except:
             raise
-        return json
+        return json_doc
