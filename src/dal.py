@@ -47,13 +47,6 @@ class CouchDB:
         return self.write_db.create(json)
 
     def deleteDoc(self, id):
-<<<<<<< HEAD
-        self.lock.acquire()
-        doc = self.getDoc(id)
-        self.cache.pop(id)  #clear document from cache
-        self.write_db.delete(doc)
-        self.lock.release()
-=======
         try:
             self.lock.acquire()
 
@@ -63,7 +56,7 @@ class CouchDB:
             self.write_db.delete(doc)
         finally:
             self.lock.release()
->>>>>>> 983028de02ba90f207408ef7fb5ec3729746a6f2
+
 
     def saveDoc(self, doc):
         self.db.save(doc)
@@ -75,7 +68,6 @@ class CouchDB:
             if doc[Constants.DOCUMENT_ID] in self.cache:
                 self.cache.pop(doc[Constants.DOCUMENT_ID])  #clear document from cache
             self.write_db.update(doc)
-            self.lock.release()
         finally:
             self.lock.release()
 
