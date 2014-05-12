@@ -60,7 +60,12 @@ class Constants:
     create_pin_response ='{links:[{"url":"users/{UserId}/boards/{boardName}/pins/{pinId}","method":"GET"},' \
                         '{"url":"users/{UserId}/boards/{boardName}/pins/{pinId}","method":"PUT"},' \
                         '{"url":"users/{UserId}/boards/{boardName}/pins/{pinId},"method":"DELETE"}]}'
-
+    
+    add_comment_response ='{links:[{"url":"users/{UserId}/boards/{boardName}/pins/{pinId}/comments","method":"POST"},' \
+                        '{"url":"users/{UserId}/boards/{boardName}/pins/{pinId}/comments/{addedby}/{comment},"method":"DELETE"}]}'
+    add_comment_error = 'Error while adding comment'
+    update_comment_error = 'Error while updating the comment'
+    delete_comment_error = 'Error while deleting the comment' 
 
     USERID = '{UserId}'
     BOARD_NAME = '{boardName}'
