@@ -27,10 +27,8 @@ class CouchDB:
         document = None
         try:
             self.lock.acquire()
-            print "Lock Acquired"
 
             if id not in self.cache.keys():  #document not in cache
-                print "id is not in cache"
                 document = self.read_db.get(id)
 
                 if self.cache.__len__() == Constants.CACHE_SIZE:
@@ -38,7 +36,6 @@ class CouchDB:
 
                 self.cache.__setitem__(id,  document)
             else:  #get from cache
-                print "Id is not in database"
                 document = self.cache.__getitem__(id)
             return document
         finally:
@@ -49,13 +46,15 @@ class CouchDB:
         return self.write_db.create(json)
 
     def deleteDoc(self, id):
-        self.lock.acquire()
+        try:
+            self.lock.acquire()
 
-        doc = self.getDoc(id)
-        if id in self.cache:
-            self.cache.pop(id)  #clear document from cache
-        self.write_db.delete(doc)
-        self.lock.release()
+            doc = self.getDoc(id)
+            if id in self.cache:
+                self.cache.pop(id)  #clear document from cache
+            self.write_db.delete(doc)
+        finally:
+            self.lock.release()
 
 
     def updateDoc(self, doc):
@@ -66,8 +65,8 @@ class CouchDB:
                 self.cache.pop(doc[Constants.DOCUMENT_ID])  #clear document from cache
             self.write_db.update(doc)
             self.lock.release()
-        except Exception as e:
-            print(e)
+        finally:
+            self.lock.release()
 
 
 class DBFactory:
