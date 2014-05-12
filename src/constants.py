@@ -30,3 +30,8 @@ class Constants:
     EMAIL_REGEX = '\.|@'
     NORMALIZE_CHAR = '-'
     COOKIE_KEY = 'pinterest-user'
+
+    #DB Constants
+    WRITE_URL = "http://127.0.0.1:5984/pinterest"
+    READ_URL = "http://127.0.0.1:5984/pinterest"
+    CACHE_SIZE = 100

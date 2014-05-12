@@ -36,8 +36,9 @@ class User:
             raise ValueError(Constants.ERROR_INVALID_EMAIL)
 
         doc = []
+        userid = Util.normalizestring(user[Constants.EMAIL])
         try:
-            doc = self.connection.getDoc(user[Constants.EMAIL])
+            doc = self.connection.getDoc(userid)
         except:
             raise Exception(Constants.ERROR_DB)
 

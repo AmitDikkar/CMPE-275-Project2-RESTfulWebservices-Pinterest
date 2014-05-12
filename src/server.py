@@ -12,6 +12,8 @@ def error404(error):
 
 
 '''user resource routes '''
+user = User()
+
 
 def validate_input(request):
     try:
@@ -32,7 +34,6 @@ def signup():
         return Constants.ERROR_INVALID_INPUT
 
     try:
-        user = User()
         msg = user.registeruser(json)
         response.status = Constants.RESOURCE_CREATED  #resource created successfully
         return msg
@@ -47,7 +48,6 @@ def login():
         return Constants.ERROR_INVALID_INPUT
 
     try:
-        user = User()
         msg = user.authenticateuser(json)
         response.set_cookie(Constants.COOKIE_KEY, Util.normalizestring(json[Constants.EMAIL]))
         response.status = Constants.ACCEPTED  #login request successful
