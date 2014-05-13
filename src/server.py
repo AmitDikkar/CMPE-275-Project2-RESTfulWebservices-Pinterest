@@ -250,7 +250,7 @@ def addComment(userId,boardName,pinName,addedBy):
     msg='success'
     print 'Add Comment called'
     try:
-        dal.addNewComment(userId, boardName,pinName, json)
+        pinDao.addNewComment(userId, boardName,pinName, json)
         #msg = form_addComment_response(userId, boardName)
     except:
         response.statusCode = 400
@@ -259,21 +259,21 @@ def addComment(userId,boardName,pinName,addedBy):
 
 @route('/users/<UserId>/boards/<boardName>/<pinName>/comments/<comment>', method='GET')
 def getComment(UserId,boardName,pinName,comment):
-    comment = dal.getComment(UserId,boardName,pinName,comment)
+    comment = pinDao.getComment(UserId,boardName,pinName,comment)
     if comment == None:
         return "Comment not found"
     return comment
 
 @route('/users/<UserId>/boards/<boardName>/<pinName>/comments/all', method='GET')
 def getAllComments(UserId,boardName,pinName,comment):
-    comment = dal.getAllComments(UserId,boardName,pinName)
+    comment = pinDao.getAllComments(UserId,boardName,pinName)
     if comment == None:
         return "No Comments found"
     return comment
 
 @route('/users/<UserId>/boards/<boardName>/<pinName>/comments/<addedBy>/<comment>/', method='DELETE')
 def deleteComment(UserId,boardName,pinName,addedBy,comment):
-    msg = dal.deleteComment(UserId,boardName,pinName,addedBy,comment)
+    msg = pinDao.deleteComment(UserId,boardName,pinName,addedBy,comment)
     if msg == None:
         return "not found"
     return "deleted"
