@@ -8,7 +8,7 @@
 # Updated By:  Hrishikesh P
 # Update Date: 12/05/2014
 # Update Desc: Added functions to add,delete comments
-#   
+#
 # Copyright:   (c) anup 2014
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ class PinDao:
                     if board["boardName"] == boardName:
                         board['pins'].append(json)
                         #self.db.save(doc)
-                        DBFactory.getdb().saveDoc(doc)
+                        DBFactory.getdb().updateDoc(doc)
                         return "New Pin added"
                  return
 
@@ -84,7 +84,7 @@ class PinDao:
                             if pins[index]['pinName'] == pinName:
                                 pins.pop(index)
                                 #self.db.save(doc)
-                                DBFactory.getdb().saveDoc(doc)
+                                DBFactory.getdb().updateDoc(doc)
                                 return "pin deleted"
                 return None
             except Exception as e:
@@ -107,7 +107,7 @@ class PinDao:
                                 pin['image'] = json['image']
                                 pin['description'] = json['description']
                                 #self.db.save(doc)
-                                DBFactory.getdb().saveDoc(doc)
+                                DBFactory.getdb().updateDoc(doc)
                                 return "pin updated"
                 return None
             except Exception as e:
@@ -246,7 +246,7 @@ class PinDao:
             print e.message
             print 'error fetching all comments'
 
-    @staticmethod # Comment deletion 
+    @staticmethod # Comment deletion
     def deleteComment(self,UserId,boardName,pinName,addedBy,comment):
         i = 0
         print 'Delete comment called'
@@ -267,7 +267,7 @@ class PinDao:
                                 if comments[index]['comment']==comment:
 
                                     print 'deleting comment'+comment+ '#'+'Added By:'+addedBy
-                                    
+
                                     comments.pop(index)
                                     self.db.save(doc)
                                     print 'Comment successfully deleted...'

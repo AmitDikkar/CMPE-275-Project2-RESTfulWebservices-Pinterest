@@ -240,13 +240,7 @@ def getAllPins(UserId,boardName):
     except Exception as e:
         print e.message
 
-def form_createPin_response(userId, boardName):
-    response_msg = create_pin_response
-    response_msg = response_msg.replace(USERID, userId)
-    response_msg = response_msg.replace(BOARD_NAME,boardName)
-    response_msg = WHITESPACE.join(response_msg.split())
-    response_msg = response_msg.replace(WHITESPACE, HYPHEN)
-    return response_msg
+
 
 #################################  Comment Operations  ###########################################
 #Comments related functions
@@ -285,6 +279,15 @@ def deleteComment(UserId,boardName,pinName,addedBy,comment):
     return "deleted"
 
 ###############################################################################################
+
+def form_createPin_response(userId, boardName):
+    response_msg = Constants.create_pin_response
+    response_msg = response_msg.replace(Constants.USERID, userId)
+    response_msg = response_msg.replace(Constants.BOARD_NAME,boardName)
+    response_msg = Constants.WHITESPACE.join(response_msg.split())
+    response_msg = response_msg.replace(Constants.WHITESPACE, Constants.HYPHEN)
+    return response_msg
+
 
 def form_getboard_response(id, board):
     response_message = Constants.get_board_response.replace(Constants.BOARD_NAME_VALUE, board[Constants.BOARDNAME])
