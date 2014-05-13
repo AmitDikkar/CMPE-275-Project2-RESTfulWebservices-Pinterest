@@ -8,7 +8,7 @@
 # Updated By:  Hrishikesh P
 # Update Date: 12/05/2014
 # Update Desc: Added functions to add,delete comments
-#
+#   
 # Copyright:   (c) anup 2014
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ class PinDao:
                     if board["boardName"] == boardName:
                         board['pins'].append(json)
                         #self.db.save(doc)
-                        DBFactory.getdb().updateDoc(doc)
+                        DBFactory.getdb().saveDoc(doc)
                         return "New Pin added"
                  return
 
@@ -84,7 +84,7 @@ class PinDao:
                             if pins[index]['pinName'] == pinName:
                                 pins.pop(index)
                                 #self.db.save(doc)
-                                DBFactory.getdb().updateDoc(doc)
+                                DBFactory.getdb().saveDoc(doc)
                                 return "pin deleted"
                 return None
             except Exception as e:
@@ -107,7 +107,7 @@ class PinDao:
                                 pin['image'] = json['image']
                                 pin['description'] = json['description']
                                 #self.db.save(doc)
-                                DBFactory.getdb().updateDoc(doc)
+                                DBFactory.getdb().saveDoc(doc)
                                 return "pin updated"
                 return None
             except Exception as e:
@@ -115,8 +115,7 @@ class PinDao:
                 print 'error in updating pin'
                 return None
 
-
-    @staticmethod
+        @staticmethod
     def likeAndGetPin(self,likeBy, userId, boardName, pinName):
         try:
             doc = self.db.getDoc(userId)
@@ -206,7 +205,6 @@ class PinDao:
             print e.message
             print 'error in adding new comment'
 
-
     @staticmethod
     def getComment(self,UserId,boardName,pinName,addedBy,comment):
         try:
@@ -226,9 +224,8 @@ class PinDao:
             print e.message
             print 'error in fetching comment'
 
-
-    @staticmethod
-    def getAllComments(self,UserId,boardName,pinName):
+     @staticmethod
+     def getAllComments(self,UserId,boardName,pinName):
         try:
             doc = self.db.get(UserId)
             boards = doc["boards"]
@@ -246,7 +243,7 @@ class PinDao:
             print e.message
             print 'error fetching all comments'
 
-    @staticmethod # Comment deletion
+    @staticmethod # Comment deletion 
     def deleteComment(self,UserId,boardName,pinName,addedBy,comment):
         i = 0
         print 'Delete comment called'
@@ -267,7 +264,7 @@ class PinDao:
                                 if comments[index]['comment']==comment:
 
                                     print 'deleting comment'+comment+ '#'+'Added By:'+addedBy
-
+                                    
                                     comments.pop(index)
                                     self.db.save(doc)
                                     print 'Comment successfully deleted...'
@@ -281,11 +278,12 @@ class PinDao:
             print e.message
             print 'error in deleting comment'
 
+
+ 
     @staticmethod
     def getUserDoc(id):
-        json_doc = []
         try:
-            json_doc = DBFactory.getdb().getDoc(id)
+            json = DBFactory.getdb().getDoc(id)
         except:
             raise
-        return json_doc
+        return json
