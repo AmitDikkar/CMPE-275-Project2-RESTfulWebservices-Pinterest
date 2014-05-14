@@ -69,6 +69,8 @@ class Constants:
 
     USERID = '{UserId}'
     BOARD_NAME = '{boardName}'
+    PIN_NAME = '{pinName}'
+    ADDED_BY = '{addedBy}'
     HYPHEN = '-'
     WHITESPACE = ' '
     BOARDS = 'boards'
