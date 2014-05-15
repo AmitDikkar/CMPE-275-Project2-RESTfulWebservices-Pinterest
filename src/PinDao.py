@@ -27,17 +27,21 @@ class PinDao:
                  #doc = self.db.get(userId)
                  doc = PinDao.getUserDoc(userId)
                  boards = doc["boards"]
+                 count = 0
                  for board in boards:
                     if board["boardName"] == boardName:
-                        board['pins'].append(json)
-                        #self.db.save(doc)
-                        DBFactory.getdb().saveDoc(doc)
+                        if not Constants.PINS in board:
+                            doc.boards[count][Constants.PINS] = []
+
+                        doc.boards[count][Constants.PINS].append(json)
+                        DBFactory.getdb().updateDoc(doc)
                         return "New Pin added"
-                 return
+
+                    count += 1
+                 return None
 
             except Exception as e:
                 print e.message
-                print 'error in adding new pin'
 
     @staticmethod
     def getPin(UserId,boardName,pinName):
@@ -84,7 +88,7 @@ class PinDao:
                             if pins[index]['pinName'] == pinName:
                                 pins.pop(index)
                                 #self.db.save(doc)
-                                DBFactory.getdb().saveDoc(doc)
+                                DBFactory.getdb().updateDoc(doc)
                                 return "pin deleted"
                 return None
             except Exception as e:
@@ -107,7 +111,7 @@ class PinDao:
                                 pin['image'] = json['image']
                                 pin['description'] = json['description']
                                 #self.db.save(doc)
-                                DBFactory.getdb().saveDoc(doc)
+                                DBFactory.getdb().updateDoc(doc)
                                 return "pin updated"
                 return None
             except Exception as e:
@@ -115,7 +119,7 @@ class PinDao:
                 print 'error in updating pin'
                 return None
 
-        @staticmethod
+    @staticmethod
     def likeAndGetPin(self,likeBy, userId, boardName, pinName):
         try:
             doc = self.db.getDoc(userId)
@@ -177,29 +181,27 @@ class PinDao:
 
     #Comments related functions
     @staticmethod
-    def addNewComment(self,userId, boardName,pinName,json):
-        noOfPins = 0
+    def addNewComment(self,userId, boardName, pinName,json):
         try:
-             doc = self.db.get(userId)
-             boards = doc["boards"]
-             noOfPins = len(boards)
-             print json
+             doc = DBFactory.getdb().getDoc(userId)
+             boards = doc[Constants.BOARDS]
+             board_index = pin_index = 0
+
              for board in boards:
-                if board["boardName"] == boardName:
-                    pins=board["pins"]
+                if board[Constants.BOARDNAME] == boardName:
+                    pins = board[Constants.PINS]
                     for pin in pins:
-                      try:
-                        print 'Inside add comment loop '
                         if pin['pinName'] == pinName:
-                            print 'appending new comment'
-                            pin['comments'].append(json)
-                            self.db.update(doc)
-                            print "New comment added for the pin:"+ pinName
+                            if not 'comments' in pin:
+                                doc.boards[board_index].pins[pin_index]['comments'] = []
+
+                            doc.boards[board_index].pins[pin_index]['comments'].append(json)
+
+                            DBFactory.getdb().updateDoc(doc)
+                            print "New comment added for the pin : " + pinName
                             return
-                      except Exception as err:
-                          print err.message
-                   # board['pins'].append(json)
-                   # self.db.save(doc)
+                    pin_index += 1
+                board_index += 1
 
         except Exception as e:
             print e.message
@@ -224,8 +226,8 @@ class PinDao:
             print e.message
             print 'error in fetching comment'
 
-     @staticmethod
-     def getAllComments(self,UserId,boardName,pinName):
+    @staticmethod
+    def getAllComments(self,UserId,boardName,pinName):
         try:
             doc = self.db.get(UserId)
             boards = doc["boards"]

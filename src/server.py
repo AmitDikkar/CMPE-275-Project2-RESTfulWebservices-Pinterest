@@ -8,7 +8,6 @@ import json
 
 '''error routes'''
 
-
 @error(404)
 def error404(error):
     return 'Sorry. Nothing here. Try /users/login or /signup'
@@ -30,7 +29,7 @@ def is_user_authenticated(request):
         return True
     return False
 
-@route('/signup', method='POST')  # or @post('/services/signup')
+@route('/users/signup', method='POST')  # or @post('/services/signup')
 def signup():
     json = validate_input(request)
     if json is None:
@@ -52,7 +51,9 @@ def login():
 
     try:
         msg = user.authenticateuser(json)
-        response.set_cookie(Constants.COOKIE_KEY, Util.normalizestring(json[Constants.EMAIL]))
+        expiry_time = Util.expiry_time()
+        hash = Util.md5(json[Constants.EMAIL] + str(expiry_time))
+        response.set_cookie(Constants.COOKIE_KEY, hash, httponly=True, expires=expiry_time)
         response.status = Constants.ACCEPTED  #login request successful
         return msg
     except Exception as e:
@@ -119,7 +120,14 @@ def followUser(userId):
 
 @post('/users/<id>/boards')
 def createboard(id):
-    json = request.json
+
+    if not is_user_authenticated(request):
+        return Constants.ERROR_SESSION
+
+    json = validate_input(request)
+    if json is None:
+        return Constants.ERROR_INVALID_INPUT
+
     msg = Constants.create_board_error
     try:
         BoardDao.createboard(json, id)
@@ -146,13 +154,16 @@ def updateboard(id, boardName):
 
 @get('/users/<id>/boards')
 def getAllUserboards(id):
+
+    if not is_user_authenticated(request):
+        return Constants.ERROR_SESSION
+
     msg = Constants.get_boards_error
     try:
         msg = BoardDao.getUserboards(id)
         msg = json.dumps(msg)
     except Exception as e:
         response.status = Constants.INTERNAL_SERVER_ERROR
-        return e
     return msg
 
 
@@ -170,6 +181,10 @@ def deleteBoard(id, boardName):
 
 @get('/users/<id>/boards/<boardName>')
 def getBoardDetails(id, boardName):
+
+    if not is_user_authenticated(request):
+        return Constants.ERROR_SESSION
+
     msg = Constants.get_board_error
     try:
         json = BoardDao.getBoardDetails(id, boardName.lower())
@@ -184,21 +199,27 @@ def getBoardDetails(id, boardName):
 # Function to create pin
 @route('/users/<userId>/boards/<boardName>/pins/', method='POST')
 def createPin(userId,boardName):
-    json = request.json
+
+    if not is_user_authenticated(request):
+        return Constants.ERROR_SESSION
+
+    json = validate_input(request)
+    if json is None:
+        return Constants.ERROR_INVALID_INPUT
+
     try:
         msg = PinDao.addNewPin(userId, boardName, json)
-        if msg == None:
+        if msg is None:
+            response.status = 400
             return "error in adding pin"
-            response.statusCode = 400
 
         msg = form_createPin_response(userId, boardName)
-        response.statusCode = 201 
+        response.status = Constants.RESOURCE_CREATED
     except Exception as e:
         print e.message
-        response.statusCode = 400
+        response.status = 400
         msg = "exception in adding pin"
         return msg
-    return msg
 
 
 @route('/users/<UserId>/boards/<boardName>/<pinName>/', method='GET')
@@ -251,11 +272,11 @@ def getAllPins(UserId,boardName):
 
 # Routine to create a pin response
 def form_createPin_response(userId, boardName):
-    response_msg = create_pin_response
-    response_msg = response_msg.replace(USERID, userId)
-    response_msg = response_msg.replace(BOARD_NAME,boardName)
-    response_msg = WHITESPACE.join(response_msg.split())
-    response_msg = response_msg.replace(WHITESPACE, HYPHEN)
+    response_msg = Constants.create_pin_response
+    response_msg = response_msg.replace(Constants.USERID, userId)
+    response_msg = response_msg.replace(Constants.BOARD_NAME, boardName)
+    response_msg = Constants.WHITESPACE.join(response_msg.split())
+    response_msg = response_msg.replace(Constants.WHITESPACE, Constants.HYPHEN)
     return response_msg
 
 #################################  Comment Operations  ###########################################
@@ -266,44 +287,48 @@ def addComment(userId,boardName,pinName,addedBy):
     msg=''
     #print 'Add Comment called'
     try:
-        dal.addNewComment(userId, boardName,pinName, json)
+        pinDao.addNewComment(userId, boardName,pinName, json)
         msg = form_addComment_response(userId, boardName,pinName,addedBy)
         response.statusCode = 201
     except:
         response.statusCode = 400
-        msg = comment_add_fail
+        msg = Constants.comment_add_fail
     return msg
 
 @route('/users/<UserId>/boards/<boardName>/<pinName>/comments/<comment>', method='GET')
 def getComment(UserId,boardName,pinName,comment):
     try:
-    comment = dal.getComment(UserId,boardName,pinName,comment)
-    if comment == None:
-        response.statusCode = 200
-        return "Comment not found"
-    return comment
+        comment = pinDao.getComment(UserId,boardName,pinName,comment)
+        if comment == None:
+          response.statusCode = 200
+          return "Comment not found"
+        return comment
     except:
-    response.statusCode = 400
+        response.statusCode = 400
+
+
 @route('/users/<UserId>/boards/<boardName>/<pinName>/comments/all', method='GET')
 def getAllComments(UserId,boardName,pinName,comment):
     try:
-    comment = dal.getAllComments(UserId,boardName,pinName)
-    if comment == None:
-        return "No Comments found"
-    response.statusCode = 200
-    return comment
+        comment = pinDao.getAllComments(UserId,boardName,pinName)
+        if comment == None:
+            return "No Comments found"
+        response.statusCode = 200
+        return comment
     except:
-    response.statusCode = 400
+        response.statusCode = 400
+
+
 @route('/users/<UserId>/boards/<boardName>/<pinName>/comments/<addedBy>/<comment>/', method='DELETE')
 def deleteComment(UserId,boardName,pinName,addedBy,comment):
     try:
-    msg = dal.deleteComment(UserId,boardName,pinName,addedBy,comment)
-    if msg == None:
-        return "not found"
-    response.statusCode = 200
-    return "deleted"
+        msg = pinDao.deleteComment(UserId,boardName,pinName,addedBy,comment)
+        if msg == None:
+            return "not found"
+        response.statusCode = 200
+        return "deleted"
     except:
-    response.statusCode = 400
+        response.statusCode = 400
 ###############################################################################################
 
 def form_getboard_response(id, board):
@@ -339,7 +364,5 @@ def form_addComment_response(id, boardname,pinName,addedBy):
     addedBy = addedBy.replace(Constants.WHITESPACE, Constants.HYPHEN)
     response_msg = response_msg.replace(Constants.ADDED_BY, addedBy)
     return response_msg
-
-
 
 run(host='localhost', port=8080)

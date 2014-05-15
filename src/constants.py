@@ -32,8 +32,8 @@ class Constants:
     COOKIE_KEY = 'pinterest-user'
 
     #DB Constants
-    WRITE_URL = "http://127.0.0.1:5984/pinterest"
-    READ_URL = "http://127.0.0.1:5984/pinterest"
+    WRITE_URL = "http://192.168.0.87:5984/pinterest"
+    READ_URL = "http://192.168.0.87:5984/pinterest"
     CACHE_SIZE = 100
 
     #Board constants
@@ -55,6 +55,7 @@ class Constants:
     get_board_error = 'Error while fetching the board details'
     update_board_error = 'Error while updating the board'
     delete_board_error = 'Error while deleting the board'
+    boards_empty_error = 'No boards created. Create new.'
 
     #pin constants
     create_pin_response ='{links:[{"url":"users/{UserId}/boards/{boardName}/pins/{pinId}","method":"GET"},' \
@@ -82,3 +83,4 @@ class Constants:
     BOARD_DESC = 'boardDesc'
     CATEGORY = 'category'
     ISPRIVATE = 'isPrivate'
+    PINS = 'pins'

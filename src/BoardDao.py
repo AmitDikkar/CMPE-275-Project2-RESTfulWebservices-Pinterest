@@ -58,11 +58,10 @@ class BoardDao:
 
     @staticmethod
     def getUserboards(id):
-        try:
-            msg = BoardDao.getUserDoc(id)
+        msg = BoardDao.getUserDoc(id)
+        if Constants.BOARDS in msg:
             return msg.boards
-        except:
-            raise
+        return Constants.boards_empty_error
 
     @staticmethod
     def getBoardDetails(id, boardName):
